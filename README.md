@@ -26,7 +26,7 @@ async function chatWithAgent() {
       messages: [
         { role: 'user', content: 'Hello, how can you help me today?' }
       ],
-      model: 'gpt-4', // optional, defaults to gpt-4
+      model: 'gpt-4o-mini', // optional, defaults to gpt-4o-mini
       email: 'user@example.com' // optional
     });
     
@@ -37,6 +37,63 @@ async function chatWithAgent() {
 }
 
 chatWithAgent();
+```
+
+## Using with Next.js API Routes
+
+Here's an example of how to use SmartUp in a Next.js API route:
+
+```typescript
+// pages/api/smartup.ts
+import type { NextApiRequest, NextApiResponse } from "next";
+import { SmartUp } from "smartup";
+
+type Data = {
+  response?: string;
+  error?: string;
+};
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    // Set your SmartUp server URL
+    SmartUp.setServerUrl(process.env.SMARTUP_SERVER_URL || 'https://your-smartup-server.com');
+    
+    // Get data from request body
+    const { message, agent } = req.body;
+    
+    // Call SmartUp API
+    const response = await SmartUp.chat.create({
+      agent: agent || 'default-agent',
+      messages: [
+        { role: 'user', content: message || 'Hello' }
+      ],
+      // Optional parameters
+      email: req.body.email || 'user@example.com'
+    });
+    
+    return res.status(200).json({ response });
+  } catch (error) {
+    console.error('SmartUp API error:', error);
+    return res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+}
+```
+
+You can test this API route by sending a POST request to `/api/smartup` with a request body like:
+
+```json
+{
+  "message": "Hello, how can you help me?",
+  "agent": "your-agent-name",
+  "email": "user@example.com"
+}
 ```
 
 ## API Reference
@@ -61,7 +118,7 @@ Creates a new chat with a SmartUp agent.
 |-----------|------|----------|---------|-------------|
 | agent | string | Yes | - | The name of the agent to chat with |
 | messages | Array | Yes | - | Array of message objects with role and content |
-| model | string | No | 'gpt-4' | The model to use for the chat |
+| model | string | No | 'gpt-4o-mini' | The model to use for the chat |
 | email | string | No | 'module@smartup.lat' | User email for identification |
 | hyperparameters | Object | No | {} | Additional parameters for the model |
 | conversationId | string | No | Random ID | ID to track the conversation |
@@ -77,9 +134,44 @@ const response = await SmartUp.chat.create({
     { role: 'system', content: 'You are a helpful assistant.' },
     { role: 'user', content: 'I need help with my order.' }
   ],
-  model: 'gpt-4-turbo',
+  model: 'gpt-4o-mini',
   email: 'customer@example.com'
 });
+```
+
+## Testing
+
+To test the functionality of your SmartUp integration, you can create a simple script:
+
+```typescript
+// test.js
+import { SmartUp } from 'smartup';
+
+// Set your environment variables
+process.env.SMARTUP_SERVER_URL = 'https://your-smartup-server.com';
+
+async function testSmartUp() {
+  try {
+    const response = await SmartUp.chat.create({
+      agent: 'test-agent',
+      messages: [
+        { role: 'user', content: 'Hello, this is a test message.' }
+      ]
+    });
+    
+    console.log('Response:', response);
+    console.log('Test passed!');
+  } catch (error) {
+    console.error('Test failed:', error);
+  }
+}
+
+testSmartUp();
+```
+
+Run the test with:
+```bash
+node test.js
 ```
 
 ## License

@@ -51,7 +51,7 @@ export class SmartUp {
                 messages: options.messages,
                 agentName: options.agent,
                 email: options.email || "module@smartup.lat",
-                model: options.model || "gpt-4",
+                model: options.model || "gpt-4o-mini",
                 hyperparameters: options.hyperparameters || {},
                 customDeployment: options.customDeployment || "",
                 responseFormat: options.responseFormat,
