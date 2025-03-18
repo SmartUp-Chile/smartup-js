@@ -1,11 +1,11 @@
 import fetch from 'node-fetch';
 
-interface Message {
+export interface Message {
     role: string;
     content: string;
 }
 
-interface ChatOptions {
+export interface ChatOptions {
     agent: string;
     messages: Message[];
     model?: string;
@@ -19,10 +19,31 @@ interface ChatOptions {
 export class SmartUp {
     private static serverUrl = process.env.SMARTUP_SERVER_URL || "";
 
+    /**
+     * Set the SmartUp server URL manually
+     * @param url The SmartUp server URL
+     */
+    public static setServerUrl(url: string): void {
+        SmartUp.serverUrl = url;
+    }
+
+    /**
+     * Get the current SmartUp server URL
+     * @returns The current server URL
+     */
+    public static getServerUrl(): string {
+        return SmartUp.serverUrl;
+    }
+
     static chat = class {
+        /**
+         * Create a new chat with the SmartUp API
+         * @param options Chat configuration options
+         * @returns The response from the SmartUp API
+         */
         static async create(options: ChatOptions): Promise<string> {
             if (!SmartUp.serverUrl) {
-                throw new Error("SMARTUP_SERVER_URL is not set.");
+                throw new Error("SMARTUP_SERVER_URL is not set. Use SmartUp.setServerUrl() or set the SMARTUP_SERVER_URL environment variable.");
             }
 
             const data = {
@@ -43,6 +64,10 @@ export class SmartUp {
                 },
                 body: JSON.stringify(data),
             });
+
+            if (!response.ok) {
+                throw new Error(`SmartUp API error: ${response.status} ${response.statusText}`);
+            }
 
             const responseText = await response.text();
             return responseText.replace("[DONE]", "");

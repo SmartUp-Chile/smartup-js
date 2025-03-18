@@ -1,11 +1,23 @@
 {
   "name": "smartup",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A JavaScript library for interacting with the SmartUp API and platform",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "smartup",
+    "api",
+    "llm",
+    "ai"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -14,5 +26,13 @@
   },
   "dependencies": {
     "node-fetch": "^3.3.2"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/smartup-js.git"
   }
 }
